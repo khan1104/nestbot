@@ -80,8 +80,8 @@ export function Chat({ conversationId, onFirstMessage }: Props) {
     };
 
     return (
-        <div className="flex flex-col h-screen w-full">
-            <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
+        <div className="flex flex-col h-full w-full">
+            <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-2 md:p-4">
                 {messages.map((msg, i) => (
                     <ChatMessage key={i} role={msg.role} content={msg.content} />
                 ))}
@@ -95,14 +95,14 @@ export function Chat({ conversationId, onFirstMessage }: Props) {
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSend} className="flex gap-2 p-4 border-t bg-white">
+            <form onSubmit={handleSend} className="flex gap-2 p-2 md:p-4 border-t bg-white">
                 <Input
-                    className="flex-1 h-14 rounded-2xl text-lg px-4"
+                    className="flex-1 h-12 md:h-14 rounded-2xl text-base md:text-lg px-4"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
                 />
-                <Button className="h-14 px-6 rounded-2xl text-lg" type="submit">
+                <Button className="h-12 md:h-14 px-4 md:px-6 rounded-2xl text-base md:text-lg" type="submit">
                     Send
                 </Button>
             </form>

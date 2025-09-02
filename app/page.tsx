@@ -4,13 +4,14 @@ import Image from "next/image";
 import { Chat } from "@/components/Chat";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Menu } from "lucide-react";
 
 type ChatType = { id: number; title: string };
 
 export default function Home() {
   const [chats, setChats] = useState<ChatType[]>([]);
   const [activeChat, setActiveChat] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const loadChats = async () => {
@@ -21,7 +22,6 @@ export default function Home() {
     loadChats();
   }, []);
 
-  
   const handleNewChat = async () => {
     const res = await fetch("/api/chats", {
       method: "POST",
@@ -30,9 +30,9 @@ export default function Home() {
     const newChat = await res.json();
     setChats([newChat, ...chats]);
     setActiveChat(newChat.id);
+    setSidebarOpen(false);
   };
 
-  
   const handleDeleteChat = async (id: number) => {
     setChats((prev) => prev.filter((chat) => chat.id !== id));
     if (activeChat === id) setActiveChat(null);
@@ -54,8 +54,23 @@ export default function Home() {
   };
 
   return (
-    <main className="flex h-screen bg-gray-50">
-      <aside className="hidden md:flex w-64 bg-white border-r flex-col p-4 shadow-md">
+    <main className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Mobile sidebar toggle button */}
+      <Button
+        className="md:hidden fixed top-4 left-4 z-20"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        <Menu className="w-6 h-6" />
+      </Button>
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed md:relative top-0 left-0 z-10 h-full w-64 bg-white border-r flex-col p-4 shadow-md
+          transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300
+          md:translate-x-0 flex
+        `}
+      >
         <div className="flex flex-col items-center mb-6">
           <Image src="/logo.png" alt="NestBot Logo" width={40} height={40} className="mb-2" />
           <div className="text-xl font-bold">NestBot</div>
@@ -73,12 +88,15 @@ export default function Home() {
               <div
                 key={chat.id}
                 className={`flex items-center justify-between p-2 rounded-md ${activeChat === chat.id
-                    ? "bg-blue-100 text-blue-700 font-semibold"
-                    : "hover:bg-gray-100 text-gray-700"
+                  ? "bg-blue-100 text-blue-700 font-semibold"
+                  : "hover:bg-gray-100 text-gray-700"
                   }`}
               >
                 <span
-                  onClick={() => setActiveChat(chat.id)}
+                  onClick={() => {
+                    setActiveChat(chat.id);
+                    setSidebarOpen(false); // Close sidebar on mobile
+                  }}
                   className="flex-1 truncate cursor-pointer"
                 >
                   {chat.title}
@@ -101,11 +119,12 @@ export default function Home() {
         </div>
       </aside>
 
+      {/* Chat Section */}
       <section className="flex-1 flex">
         {activeChat ? (
           <Chat
             key={activeChat}
-            conversationId={activeChat} 
+            conversationId={activeChat}
             onFirstMessage={(msg: string) => updateChatTitle(activeChat, msg)}
           />
         ) : (
