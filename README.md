@@ -14,7 +14,5 @@ NestBot is a Next.js + Prisma + Google Gemini AI chatbot web application. It all
 
 ---
 
-## live on 
-- https://nestbot-1.vercel.app/
 
 ### 
